@@ -1,0 +1,21 @@
+{
+    "name": "Pola Nexarion Offline",
+    "short_name": "Nexarion",
+    "description": "Generator pola offline untuk tim Nexarion.",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#101010",
+    "theme_color": "#00CED1",
+    "icons": [
+      {
+        "src": "/logo.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/logo.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }

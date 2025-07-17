@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pola Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="manifest" href="/manifest.json">
+    <style>
+        /* Definisi variabel CSS untuk manajemen tema yang mudah */
+        :root {
+            --bg-color: #101010; /* Warna latar belakang hitam sangat gelap */
+            --card-bg: rgba(25, 25, 25, 0.98); /* Latar belakang kartu yang sangat gelap dan hampir buram */
+            --text-color: #F0F0F0; /* Warna teks putih keabu-abuan */
+            --accent-color: #00CED1; /* Warna aksen: DarkCyan (biru kehijauan tua) */
+            --header-gradient-start: #1A1A2A; /* Hitam kebiruan sangat gelap untuk gradien header */
+            --header-gradient-end: #303040; /* Abu-abu kebiruan gelap untuk gradien header */
+            --button-gradient-start: #2A2A2A; /* Abu-abu gelap untuk tombol */
+            --button-gradient-end: #4A4A4A; /* Abu-abu lebih terang untuk tombol */
+            --input-bg: #222222; /* Latar belakang input yang sangat gelap */
+            --input-border: #444444; /* Warna border input yang gelap */
+            --focus-border: var(--accent-color); /* Menggunakan warna aksen untuk fokus */
+            --error-color: #DC143C; /* Merah crimson untuk pesan error */
+            --table-bg: #202020; /* Latar belakang tabel yang sangat gelap */
+            --table-header-bg: #303030; /* Latar belakang header tabel yang gelap */
+            --table-header-text: #40E0D0; /* Turquoise (biru kehijauan) untuk header tabel */
+            --highlight-color: rgba(0, 206, 209, 0.15); /* Highlight yang disesuaikan dengan warna aksen */
+        }
+
+        /* Keyframes untuk animasi masuk kartu */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Styling dasar body */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color); /* Menggunakan variabel CSS */
+            color: var(--text-color); /* Menggunakan variabel CSS */
+            background-image: url('R.png'); /* Pastikan 'R.png' berada di jalur yang benar */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            line-height: 1.6; /* Peningkatan keterbacaan teks body */
+            overflow-x: hidden; /* Mencegah scroll horizontal yang tidak diinginkan */
+        }
+
+        /* Styling header */
+        header {
+            padding: 25px;
+            text-align: center;
+            background: linear-gradient(90deg, var(--header-gradient-start), var(--header-gradient-end)); /* Gradien gelap */
+            font-size: 2.5rem;
+            font-weight: 700;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.6); /* Shadow yang lebih kuat untuk kedalaman */
+            display: flex; /* Menggunakan flexbox untuk penataan ikon dan teks */
+            align-items: center; /* Pusatkan item secara vertikal */
+            justify-content: center; /* Pusatkan item secara horizontal */
+            gap: 15px; /* Jarak antara ikon dan teks */
+            letter-spacing: 1.5px; /* Sedikit jarak antar huruf untuk estetika */
+        }
+
+        /* Styling ikon di header */
+        header .icon {
+            font-size: 2.8rem; /* Ukuran ikon yang sedikit lebih besar */
+            line-height: 1; /* Memastikan ikon tidak mempengaruhi tinggi baris */
+            transition: transform 0.3s ease; /* Transisi untuk efek hover */
+            color: var(--accent-color); /* Warna ikon menggunakan aksen */
+        }
+
+        /* Efek hover pada ikon header */
+        header .icon:hover {
+            transform: rotate(20deg) scale(1.15); /* Rotasi dan pembesaran yang sedikit lebih kuat saat hover */
+        }
+
+        /* Styling untuk teks judul di header dengan latar belakang aksen */
+        .header-title-bg {
+            background-color: var(--accent-color); /* Warna latar belakang teks menggunakan aksen */
+            color: var(--text-color); /* Warna teks menjadi putih agar kontras dengan aksen */
+            padding: 8px 18px; /* Padding di sekitar teks untuk visual yang lebih baik */
+            border-radius: 12px; /* Sudut membulat untuk blok latar belakang */
+            display: inline-block; /* Memastikan padding dan background diterapkan dengan benar */
+            box-shadow: 0 0 20px rgba(0, 206, 209, 0.7); /* Glow yang kuat di sekitar teks */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3); /* Shadow teks halus agar lebih menonjol */
+            transition: all 0.3s ease-out; /* Transisi untuk efek hover */
+        }
+
+        /* Efek hover pada latar belakang teks judul */
+        .header-title-bg:hover {
+            transform: scale(1.05); /* Sedikit membesar saat hover */
+            box-shadow: 0 0 30px rgba(0, 206, 209, 0.9); /* Glow yang lebih kuat saat hover */
+        }
+
+        /* Container untuk konten utama */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 25px;
+        }
+
+        /* Styling kartu untuk setiap bagian */
+        .card {
+            background: var(--card-bg); /* Latar belakang semi-transparan */
+            border-radius: 20px; /* Sudut lebih membulat */
+            padding: 30px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.6); /* Shadow yang lebih kuat */
+            backdrop-filter: blur(18px); /* Efek blur yang lebih kuat */
+            -webkit-backdrop-filter: blur(18px); /* Untuk Safari */
+            border: 1px solid rgba(255, 255, 255, 0.15); /* Border sedikit lebih terlihat */
+            transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out; /* Transisi yang lebih cepat dan ringan */
+            animation: fadeInScale 0.6s ease-out forwards; /* Animasi masuk */
+            opacity: 0; /* Mulai dengan opasitas 0 untuk animasi */
+        }
+
+        /* Penundaan animasi untuk kartu kedua */
+        .card:nth-of-type(2) {
+            animation-delay: 0.1s;
+        }
+
+        /* Efek hover pada kartu */
+        .card:hover {
+            transform: translateY(-7px); /* Sedikit terangkat lebih tinggi saat hover */
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8); /* Shadow lebih kuat saat hover */
+            border-color: var(--accent-color); /* Border berubah warna saat hover */
+        }
+
+        /* Styling heading 2 di dalam kartu */
+        h2 {
+            margin-top: 0;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.8rem;
+            border-bottom: 1px solid rgba(255,255,255,0.25); /* Garis pemisah halus yang sedikit lebih tebal */
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Spasi grup form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Styling label */
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        /* Styling input dan select */
+        input, select {
+            width: calc(100% - 24px); /* Menyesuaikan dengan padding */
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            color: var(--text-color);
+            border-radius: 10px;
+            transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out; /* Transisi yang lebih cepat */
+            font-size: 1rem;
+        }
+
+        /* Styling fokus input dan select */
+        input:focus, select:focus {
+            border-color: var(--focus-border);
+            box-shadow: 0 0 0 4px rgba(0, 206, 209, 0.4); /* Glow yang lebih kuat menggunakan aksen */
+            outline: none;
+        }
+
+        /* Efek hover pada input dan select */
+        input:hover, select:hover {
+            box-shadow: 0 0 0 2px rgba(0, 206, 209, 0.1); /* Shadow halus saat hover */
+        }
+
+        /* Styling tombol */
+        button {
+            background: linear-gradient(135deg, var(--button-gradient-start), var(--button-gradient-end));
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 15px;
+            transition: all 0.2s ease-out; /* Transisi yang lebih cepat */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4); /* Shadow yang lebih kuat */
+        }
+
+        /* Efek hover pada tombol */
+        button:hover {
+            transform: translateY(-4px) scale(1.03); /* Lift dan scale yang lebih halus */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6), 0 0 15px var(--accent-color); /* Shadow lebih kuat dan glow aksen */
+            opacity: 1; /* Opasitas penuh saat hover */
+        }
+
+        /* Styling pesan error */
+        .error {
+            color: var(--error-color);
+            font-weight: 600;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Styling tabel */
+        .member-table {
+            width: 100%;
+            border-collapse: separate; /* Allows for border-radius on cells */
+            border-spacing: 0; /* No space between cell borders */
+            background-color: var(--table-bg); /* Use table background variable */
+            border-radius: 15px; /* Rounded corners for the whole table */
+            overflow: hidden; /* Ensures content doesn't spill out of rounded corners */
+            box-shadow: 0 6px 25px rgba(0,0,0,0.7); /* Lebih kuat shadow untuk efek melayang */
+            margin-top: 30px; /* Space above the table if it follows other content */
+            border: 1px solid rgba(255, 255, 255, 0.18); /* Border sedikit lebih terlihat */
+            animation: fadeInScale 0.7s ease-out forwards; /* Animasi masuk untuk tabel */
+            animation-delay: 0.2s; /* Sedikit penundaan setelah kartu */
+            opacity: 0; /* Mulai tersembunyi untuk animasi */
+        }
+
+        /* Table Header (th) Styling */
+        .member-table th {
+            background: linear-gradient(90deg, var(--table-header-bg), #404040); /* Subtle gradient for headers */
+            color: var(--table-header-text); /* Use header text color variable */
+            padding: 20px 25px; /* Lebih banyak padding untuk header */
+            text-align: center;
+            font-weight: 700; /* Bolder header text */
+            text-transform: uppercase; /* All caps for headers */
+            font-size: 1rem; /* Ukuran font header sedikit lebih besar */
+            letter-spacing: 1.2px; /* Lebih banyak spasi huruf */
+            border-bottom: 3px solid var(--accent-color); /* Strong accent border at bottom of header */
+            transition: background 0.3s ease;
+            text-shadow: 0 0 10px rgba(0, 206, 209, 0.5); /* Glow yang lebih kuat untuk teks header */
+            position: sticky; /* Agar header tetap terlihat saat scroll */
+            top: 0;
+            z-index: 2; /* Pastikan di atas konten lain */
+        }
+
+        .member-table th:hover {
+            background: linear-gradient(90deg, #404040, var(--table-header-bg)); /* Reverse gradient on hover */
+            cursor: default; /* No pointer on header */
+        }
+
+        /* Table Data (td) Styling */
+        .member-table td {
+            padding: 16px 25px; /* Lebih banyak padding untuk data */
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Finer separator line */
+            background-color: var(--table-bg); /* Ensure consistent background for cells */
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            font-size: 0.98rem; /* Ukuran font data sedikit lebih besar */
+            color: var(--text-color); /* Use general text color for data */
+            display: table-cell; /* Pastikan td berfungsi sebagai sel tabel */
+            vertical-align: middle; /* Pusatkan konten secara vertikal */
+        }
+
+        /* Styling untuk Ikon Peran */
+        .role-icon {
+            margin-right: 8px; /* Spasi antara ikon dan teks */
+            color: var(--accent-color); /* Warna ikon menggunakan aksen */
+            font-size: 0.9em; /* Ukuran ikon relatif terhadap teks */
+            opacity: 0.8; /* Sedikit transparan */
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .member-table tbody tr:hover .role-icon {
+            transform: scale(1.2); /* Ikon membesar saat hover row */
+            opacity: 1; /* Ikon menjadi penuh saat hover row */
+        }
+
+        /* Alternating Row Colors for Readability */
+        .member-table tbody tr:nth-child(odd) td {
+            background-color: rgba(25, 25, 25, 0.85); /* Slightly different shade for odd rows */
+        }
+
+        /* Hover Effect for Table Rows */
+        .member-table tbody tr:hover td {
+            background-color: var(--highlight-color); /* Highlight row on hover using accent */
+            transform: translateY(-3px); /* Sedikit terangkat saat hover */
+            box-shadow: inset 0 0 12px rgba(0, 206, 209, 0.4); /* Inner glow yang lebih kuat */
+            cursor: pointer; /* Indicate interactivity */
+        }
+
+        /* Remove bottom border from the last row */
+        .member-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Ensure borders are also applied to the corners for the first/last cells */
+        .member-table thead tr:first-child th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .member-table thead tr:first-child th:last-child {
+            border-top-right-radius: 15px;
+        }
+
+        .member-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .member-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        /* Spasi blok match */
+        .match-block {
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        /* Tata letak baris pasangan untuk elemen select */
+        .pair-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Lebar bidang select pada baris pasangan */
+        .pair-row select {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        /* Styling baris highlight */
+        .highlight-row td {
+            background-color: var(--highlight-color) !important;
+            transition: background-color 0.2s ease-out; /* Transisi lebih cepat */
+        }
+
+        /* Styling kolom highlight */
+        .highlight-column {
+            background-color: var(--highlight-color) !important;
+            transition: background-color 0.2s ease-out; /* Transisi lebih cepat */
+        }
+
+        /* Styling efek blur */
+        .blurred {
+            filter: blur(5px); /* Blur yang sedikit lebih kuat */
+            opacity: 0.3; /* Lebih pudar */
+            pointer-events: none;
+            transition: all 0.3s ease-out; /* Transisi lebih cepat */
+        }
+
+        /* Styling Scrollbar Kustom */
+        ::-webkit-scrollbar {
+            width: 8px; /* Lebar scrollbar yang lebih ramping */
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1A1A1A; /* Track scrollbar gelap */
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-color); /* Thumb scrollbar menggunakan warna aksen */
+            border-radius: 10px;
+            border: 2px solid #1A1A1A;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00B8B8; /* Thumb scrollbar lebih terang saat hover */
+        }
+        /* Styling for the Nexarion Branding section within the card */
+        .nexarion-branding {
+            text-align: center;
+            margin-bottom: 25px; /* Add some space below this branding block */
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator */
+        }
+
+        .nexarion-logo {
+            width: 150px; /* Adjust as needed */
+            height: 150px; /* Adjust as needed */
+            border-radius: 50%; /* Make logo perfectly round */
+            object-fit: cover; /* Ensure image covers the area */
+            border: 3px solid var(--accent-color); /* Accent color border */
+            box-shadow: 0 0 15px rgba(0, 206, 209, 0.7); /* Soft glow matching accent */
+            margin-bottom: 15px; /* Space between logo and title */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .nexarion-logo:hover {
+            transform: scale(1.05) rotate(5deg); /* Slight scale and rotation on hover */
+            box-shadow: 0 0 25px rgba(0, 206, 209, 1); /* More intense glow on hover */
+        }
+
+        .nexarion-title {
+            font-size: 2.5rem; /* Larger font size for prominence */
+            font-weight: 700; /* Bold */
+            color: var(--accent-color); /* Use your defined accent color */
+            letter-spacing: 2px; /* Add some spacing for a modern look */
+            margin-top: 0;
+            margin-bottom: 5px; /* Closer to the subtitle */
+            text-shadow: 0 0 10px rgba(0, 206, 209, 0.5); /* Subtle glow effect for the title */
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .nexarion-title:hover {
+            color: #40E0D0; /* A slightly brighter turquoise on hover */
+            text-shadow: 0 0 15px rgba(0, 206, 209, 0.8);
+        }
+
+        .nexarion-subtitle {
+            font-size: 1.1rem; /* Slightly larger than original text-sm */
+            color: var(--text-color); /* Use your lighter text color for contrast */
+            letter-spacing: 1px;
+            opacity: 0.8; /* Slightly less prominent */
+            margin-top: 0;
+            font-style: italic; /* A bit of style for the subtitle */
+            transition: opacity 0.3s ease;
+        }
+
+        .nexarion-subtitle:hover {
+            opacity: 1; /* Full opacity on hover */
+        }
+        /* Additional styles for result wrapper and button */
+        .result-wrapper {
+            margin-top: 30px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            transition: all 0.3s ease-out;
+            opacity: 1; /* Default to visible */
+        }
+
+        .result-wrapper h3 {
+            color: var(--text-color);
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.15);
+            padding-bottom: 10px;
+        }
+
+        .result-wrapper button {
+            display: block; /* Make button full width */
+            width: fit-content; /* Adjust width to content */
+            margin: 15px auto 25px auto; /* Center button */
+        }
+        
+        /* Blur toggle for result wrapper */
+        .blurred-toggle {
+            filter: blur(8px);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .blurred-toggle:hover {
+             transform: none; /* Override hover transform */
+             box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Override hover shadow */
+             border-color: rgba(255, 255, 255, 0.1); /* Override hover border */
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <span class="icon">⚙️</span>
+        <span class="header-title-bg">Pola Nexarion</span>
+    </header>
+
+    <script>
+        const password = "loxganteng";
+        let input = prompt("HANYA TIM NXR YANG TAU:");
+        while (input !== password) {
+            input = prompt("SALAH! LU SIAPA WOY!");
+        }
+    </script>
+
+    <div class="container">
+        <div class="card">
+            <div class="nexarion-branding">
+                <img src="logo.PNG" alt="NXR Logo" class="nexarion-logo" />
+                <h2 class="nexarion-title">NEXARION</h2>
+                <p class="nexarion-subtitle">BIG FAMILY</p>
+            </div>
+            <table class="member-table">
+                <thead>
+                    <tr>
+                        <th>NAME</th>
+                        <th>ROLE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>NXR • LOX</td><td><i class="fas fa-crown role-icon"></i> Penguasa</td></tr>
+                    <tr><td>NXR • BOB</td><td><i class="fas fa-user-tie role-icon"></i> Manager</td></tr>
+                    <tr><td>NXR • MishaNY</td><td><i class="fas fa-chess-knight role-icon"></i> Captain</td></tr>
+                    <tr><td>NXR • WisnuAS</td><td><i class="fas fa-cube role-icon"></i> Core</td></tr>
+                    <tr><td>NXR • Roxase</td><td><i class="fas fa-chart-line role-icon"></i> Analyst</td></tr>
+                    <tr><td>NXR • CTRL+Z</td><td><i class="fas fa-cube role-icon"></i> Core</td></tr>
+                    <tr><td>NXR • Vanskiel</td><td><i class="fas fa-cube role-icon"></i> Core</td></tr>
+                    <tr><td>NXR • Wenger</td><td><i class="fas fa-handshake role-icon"></i> Sahabat</td></tr>
+                    <tr><td>NXR • Hosea</td><td><i class="fas fa-handshake role-icon"></i> Sahabat</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Input Nama Pemain</h2>
+            <div id="playerInputs"></div>
+        </div>
+
+        <div class="card">
+            <h2>Input Match 1–4</h2>
+            <div id="matchInputs"></div>
+            <button onclick="generatePola()">Generate Pola</button>
+            <div id="errorBox" class="error"></div>
+
+            <hr /> 
+            <h2>Output Pola</h2>
+            <div id="polaTables"></div>
+        </div>
+    </div>
+
+    <script>
+        const polaData = {
+            "POLA 1": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 2": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 3": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 4": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 5": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 4", "M3": "PLAYER 3", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": "PLAYER 6", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 6", "M5": "PLAYER 7", "M6": "PLAYER 5", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 2", "M3": "PLAYER 1", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 8", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 1", "M3": "PLAYER 2", "M4": "PLAYER 8", "M5": "PLAYER 5", "M6": "PLAYER 7", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 8", "M3": "PLAYER 7", "M4": "PLAYER 3", "M5": "PLAYER 4", "M6": "PLAYER 2", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 8", "M4": "PLAYER 2", "M5": "PLAYER 3", "M6": "PLAYER 1", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 5", "M4": "PLAYER 1", "M5": "PLAYER 2", "M6": "PLAYER 4", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 4", "M5": "PLAYER 1", "M6": "PLAYER 3", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 6": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 4", "M3": "PLAYER 3", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": "PLAYER 6", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 6", "M5": "PLAYER 7", "M6": "PLAYER 5", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 2", "M3": "PLAYER 1", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 8", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 1", "M3": "PLAYER 2", "M4": "PLAYER 8", "M5": "PLAYER 5", "M6": "PLAYER 7", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 8", "M3": "PLAYER 7", "M4": "PLAYER 3", "M5": "PLAYER 4", "M6": "PLAYER 2", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 8", "M4": "PLAYER 2", "M5": "PLAYER 3", "M6": "PLAYER 1", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 5", "M4": "PLAYER 1", "M5": "PLAYER 2", "M6": "PLAYER 4", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 4", "M5": "PLAYER 1", "M6": "PLAYER 3", "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 7": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 8": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 9": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 10": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 11": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 12": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 13": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 14": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ],
+            "POLA 15": [
+                {"M1": "PLAYER 2", "M2": "PLAYER 3", "M3": "PLAYER 4", "M4": "PLAYER 5", "M5": "PLAYER 6", "M6": "PLAYER 7", "M7": "PLAYER 8", "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 1", "M2": "PLAYER 5", "M3": "PLAYER 6", "M4": "PLAYER 7", "M5": "PLAYER 8", "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 4", "M2": "PLAYER 1", "M3": "PLAYER 5", "M4": "PLAYER 8", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 3", "M2": "PLAYER 8", "M3": "PLAYER 1", "M4": "PLAYER 6", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 6", "M2": "PLAYER 2", "M3": "PLAYER 7", "M4": "PLAYER 1", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 5", "M2": "PLAYER 7", "M3": "PLAYER 2", "M4": "PLAYER 4", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 8", "M2": "PLAYER 6", "M3": "PLAYER 3", "M4": "PLAYER 2", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null},
+                {"M1": "PLAYER 7", "M2": "PLAYER 4", "M3": "PLAYER 1", "M4": "PLAYER 3", "M5": null, "M6": null, "M7": null, "M8": null, "M9": null, "M10": null, "M11": null, "M12": null, "M13": null, "M14": null}
+            ]
+        };
+    </script>
+    <script>
+        function addTableHoverEffect(table) {
+            const rows = table.querySelectorAll("tr");
+            rows.forEach((row, rowIndex) => {
+                const cells = row.querySelectorAll("td, th");
+                cells.forEach((cell, colIndex) => {
+                    cell.addEventListener("mouseenter", () => {
+                        // Highlight column
+                        rows.forEach(r => {
+                            const cols = r.querySelectorAll("td, th");
+                            if (cols[colIndex]) {
+                                cols[colIndex].classList.add("highlight-column");
+                            }
+                        });
+                        // Highlight row
+                        row.classList.add("highlight-row");
+                    });
+
+                    cell.addEventListener("mouseleave", () => {
+                        // Remove highlight column
+                        rows.forEach(r => {
+                            const cols = r.querySelectorAll("td, th");
+                            if (cols[colIndex]) {
+                                cols[colIndex].classList.remove("highlight-column");
+                            }
+                        });
+                        // Remove highlight row
+                        row.classList.remove("highlight-row");
+                    });
+                });
+            });
+        }
+
+        const matchKeys = ["ROUND1", "ROUND2", "ROUND3", "ROUND4", "ROUND5", "ROUND6", "ROUND7", "ROUND8", "ROUND9", "ROUND10", "ROUND11", "ROUND12", "ROUND13", "ROUND14"];
+        const customLabels = ["I-2", "I-3", "I-4", "II-1", "II-2", "II-4", "II-5", "II-6", "III-1", "III-2", "III-4", "III-5", "III-6", "IV-1"];
+
+        const playerInputDiv = document.getElementById("playerInputs");
+        for (let i = 1; i <= 8; i++) {
+            const div = document.createElement("div");
+            div.className = "form-group";
+            div.innerHTML = `<label>Player ${i}:</label><input type="text" id="playerName${i}" placeholder="Nama Player ${i}" oninput="updateDropdowns()" />`;
+            playerInputDiv.appendChild(div);
+        }
+
+        const matchInputsDiv = document.getElementById("matchInputs");
+        for (let m = 1; m <= 4; m++) {
+            const matchDiv = document.createElement("div");
+            matchDiv.className = "form-group";
+            matchDiv.innerHTML = `<strong>Match ${m}</strong><br/>`;
+            for (let p = 1; p <= 4; p++) {
+                matchDiv.innerHTML += `
+                    <div class="pair-row">
+                        <label>Pair ${p}:</label>
+                        <select id="match${m}_pair${p}_player1"></select>
+                        <span>vs</span>
+                        <select id="match${m}_pair${p}_player2"></select>
+                    </div>`;
+            }
+            matchInputsDiv.appendChild(matchDiv);
+        }
+
+        function updateDropdowns() {
+            const names = [];
+            for (let i = 1; i <= 8; i++) {
+                const val = document.getElementById(`playerName${i}`).value || `PLAYER ${i}`;
+                names.push(val);
+            }
+            for (let m = 1; m <= 4; m++) {
+                for (let p = 1; p <= 4; p++) {
+                    for (let s = 1; s <= 2; s++) {
+                        const select = document.getElementById(`match${m}_pair${p}_player${s}`);
+                        const currentValue = select.value;
+                        select.innerHTML = "";
+                        names.forEach(name => {
+                            const opt = document.createElement("option");
+                            opt.value = name;
+                            opt.textContent = name;
+                            if (name === currentValue) opt.selected = true;
+                            select.appendChild(opt);
+                        });
+                    }
+                }
+            }
+        }
+        updateDropdowns();
+
+        function validateUniquePlayersPerMatch() {
+            const errorBox = document.getElementById("errorBox");
+            errorBox.innerHTML = "";
+            for (let m = 1; m <= 4; m++) {
+                const seen = new Set();
+                for (let p = 1; p <= 4; p++) {
+                    for (let s = 1; s <= 2; s++) {
+                        const val = document.getElementById(`match${m}_pair${p}_player${s}`).value.trim();
+                        if (!val) continue;
+                        if (seen.has(val)) {
+                            errorBox.innerHTML = `⛔ Match ${m} invalid: Pemain '<strong>${val}</strong>' muncul lebih dari sekali.`;
+                            return false;
+                        }
+                        seen.add(val);
+                    }
+                }
+                if (seen.size < 8) {
+                    errorBox.innerHTML = `⛔ Match ${m} tidak lengkap: hanya ${seen.size} pemain diisi.`;
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function generatePola() {
+            const polaArea = document.getElementById("polaTables");
+            polaArea.innerHTML = "";
+            document.getElementById("errorBox").innerHTML = "";
+
+            if (!validateUniquePlayersPerMatch()) return;
+
+            const originalNames = [];
+            for (let i = 1; i <= 8; i++) {
+                const name = document.getElementById(`playerName${i}`).value.trim() || `PLAYER ${i}`;
+                originalNames.push(name);
+            }
+
+            const inputPairings = {};
+            for (let m = 1; m <= 4; m++) {
+                inputPairings[m] = [];
+                for (let p = 1; p <= 4; p++) {
+                    const a = document.getElementById(`match${m}_pair${p}_player1`).value.trim();
+                    const b = document.getElementById(`match${m}_pair${p}_player2`).value.trim();
+                    if (a && b && a !== b) {
+                        inputPairings[m].push([a, b].sort().join("-"));
+                    }
+                }
+            }
+
+            const permutations = permute(originalNames);
+            const validResults = [];
+
+            for (const perm of permutations) {
+                const nameToPlayer = {}, playerToName = {};
+                for (let i = 0; i < 8; i++) {
+                    nameToPlayer[perm[i]] = `PLAYER ${i + 1}`;
+                    playerToName[`PLAYER ${i + 1}`] = perm[i];
+                }
+
+                const mappedInput = {};
+                for (let m = 1; m <= 4; m++) {
+                    mappedInput[m] = inputPairings[m].map(pair => {
+                        const [a, b] = pair.split("-");
+                        return [nameToPlayer[a], nameToPlayer[b]].sort().join("-");
+                    });
+                }
+
+                for (const [polaName, pola] of Object.entries(polaData)) {
+                    let match = true;
+                    for (let m = 1; m <= 4; m++) {
+                        const expectedPairs = [];
+                        for (let i = 0; i < pola.length; i++) {
+                            const p1 = `PLAYER ${i + 1}`;
+                            const p2 = pola[i][`M${m}`];
+                            if (p2 && p1 !== p2) {
+                                const pair = [p1, p2].sort().join("-");
+                                if (!expectedPairs.includes(pair)) expectedPairs.push(pair);
+                            }
+                        }
+                        const inputSet = new Set(mappedInput[m]);
+                        const expectedSet = new Set(expectedPairs);
+                        if (inputSet.size !== expectedSet.size || [...inputSet].some(p => !expectedSet.has(p))) {
+                            match = false;
+                            break;
+                        }
+                    }
+                    if (!match) continue;
+
+                    let valid = true;
+                    for (let i = 0; i < 8; i++) {
+                        const player = `PLAYER ${i + 1}`;
+                        const realName = playerToName[player];
+                        for (let m = 1; m <= 14; m++) {
+                            const opp = pola[i][`M${m}`];
+                            if (!opp) continue;
+                            const oppName = playerToName[opp];
+                            if (!oppName || oppName === realName) continue;
+                            const pair = [realName, oppName].sort().join("-");
+                            if (m <= 4 && !inputPairings[m].includes(pair)) {
+                                valid = false;
+                                break;
+                            }
+                        }
+                        if (!valid) break;
+                    }
+
+                    for (let i = 0; i < 8 && valid; i++) {
+                        const player = `PLAYER ${i + 1}`;
+                        for (let m = 5; m <= 14; m++) {
+                            const opp = pola[i][`M${m}`];
+                            if (!opp) continue;
+                            const oppIndex = parseInt(opp.split(" ")[1]) - 1;
+                            const backMatch = pola[oppIndex][`M${m}`];
+                            if (backMatch !== player) {
+                                valid = false;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!valid) continue;
+                    validResults.push({ polaName, playerToName, pola });
+                }
+            } // <-- akhir dari loop permutasi
+
+            if (validResults.length === 0) {
+                polaArea.innerHTML = "<p><strong>❌ Tidak ditemukan pola yang cocok.</strong></p>";
+                return;
+            }
+
+            const first = validResults[0];
+            const other = validResults.slice(1);
+            renderTable(first, 1);
+
+            if ((first.polaName === "POLA 5" || first.polaName === "POLA 7") && other.length > 0) {
+                const btn = document.createElement("button");
+                btn.innerText = `Tampilkan Alternatif ${first.polaName}`;
+                btn.onclick = () => {
+                    other.forEach((result, index) => renderTable(result, index + 2));
+                    btn.remove();
+                };
+                polaArea.appendChild(btn);
+            }
+        } // <-- akhir dari generatePola()
+
+        function permute(arr) {
+            const result = [];
+            const backtrack = (path, used) => {
+                if (path.length === arr.length) {
+                    result.push([...path]);
+                    return;
+                }
+                for (let i = 0; i < arr.length; i++) {
+                    if (used[i]) continue;
+                    used[i] = true;
+                    path.push(arr[i]);
+                    backtrack(path, used);
+                    path.pop();
+                    used[i] = false;
+                }
+            };
+            backtrack([], Array(arr.length).fill(false));
+            return result;
+        }
+
+        function renderTable(result, index) {
+            const polaArea = document.getElementById("polaTables");
+            const wrapper = document.createElement("div");
+            wrapper.className = "result-wrapper";
+
+            const title = document.createElement("h3");
+            title.innerText = `Pola ${result.polaName} - Alternatif ${index}`;
+            wrapper.appendChild(title);
+
+            const pilihBtn = document.createElement("button");
+            pilihBtn.innerText = "Pilih tabel ini";
+            pilihBtn.onclick = () => {
+                const isBlurred = wrapper.classList.contains("blurred-toggle");
+                document.querySelectorAll(".result-wrapper").forEach(div => {
+                    if (div !== wrapper) { // Apply blur to other wrappers
+                         div.classList.add("blurred-toggle");
+                    }
+                });
+                if (isBlurred) { // If currently blurred, remove it (unselect)
+                    wrapper.classList.remove("blurred-toggle");
+                } else { // If not blurred, select it (remove blur and apply blur to others)
+                    wrapper.classList.remove("blurred-toggle");
+                }
+            };
+            wrapper.appendChild(pilihBtn);
+
+            const table = document.createElement("table");
+            table.className = "member-table"; // Apply member-table class for consistent styling
+            const header = document.createElement("tr");
+            header.innerHTML = `<th>Nama</th>` + matchKeys.map(m => `<th>${m}</th>`).join("");
+            table.appendChild(header);
+
+            for (let i = 0; i < 8; i++) {
+                const row = document.createElement("tr");
+                row.innerHTML = `<td>${result.playerToName[`PLAYER ${i + 1}`]}</td>` +
+                    matchKeys.map(m => `<td>${result.playerToName[result.pola[i][m]] || '-'}</td>`).join("");
+                table.appendChild(row);
+            }
+
+            wrapper.appendChild(table);
+            polaArea.appendChild(wrapper);
+            addTableHoverEffect(table); // Apply hover effect to the newly created table
+        }
+    </script>
+</body>
+</html>
